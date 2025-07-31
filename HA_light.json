@@ -1,0 +1,96 @@
+{
+  "name": "Kitchen Island Lights",
+  "manufacturer": "Home Assistant",
+  "type": "LIGHT",
+  "version": 1,
+  "variables": {
+    "HA_Ip": "192.168.0.x", 
+    "HA_Port": "8123",      
+    "HA_ApiToken": "HA_API_TOKEN", 
+    "EntityId": "light.kitchen_island_lights" 
+  },
+  "discover": {
+    "welcomeheadertext": "Home Assistant Light Driver",
+    "welcomedescription": "This driver controls Home Assistant lights via HTTP API. Ensure HA_Ip, HA_Port, HA_ApiToken, and EntityId are correctly set in the driver file.",
+    "command": {
+      "type": "static",
+      "command": "",
+      "queryresult": "$" 
+    }
+  },
+  "template": {
+    "name": "Kitchen Island Lights",
+    "dynamicname": "Kitchen Island Lights", 
+    "dynamicid": "kitchen_island_lights_ha_http", 
+    "variables": {
+      "HA_Ip": "$HA_Ip",
+      "HA_Port": "$HA_Port",
+      "HA_ApiToken": "$HA_ApiToken",
+      "EntityId": "$EntityId",
+      "SwitchedOn": false,
+      "Brightness": 0
+    },
+    "listeners": {
+      "HAStatus": {
+        "type": "http-get",
+        "ishub": true, 
+        "command": "http://$HA_Ip:$HA_Port/api/states/$EntityId", 
+        "headers": {
+          "Authorization": "Bearer $HA_ApiToken",
+          "Content-Type": "application/json"
+        },
+        "pooltime": "3000", 
+        "queryresult": ["$.state", "$.attributes.brightness"], 
+        "evalwrite": [
+          {
+            "variable": "SwitchedOn",
+            "value": "DYNAMIK JSON.parse(\"$Result\")[0] === 'on'"
+          },
+          {
+            "variable": "Brightness",
+            "value": "DYNAMIK Math.round(JSON.parse(\"$Result\")[1] / 2.55)" 
+          }
+        ]
+      }
+    },
+    "switches": {
+      "POWER": {
+        "label": "On",
+        "listen": "SwitchedOn",
+        "evaldo": [
+          {"test": "DYNAMIK $Result", "then": "SWITCHON", "or": "SWITCHOFF"}
+        ]
+      }
+    },
+    "sliders": {
+      "BRIGHTNESS": {
+        "label": "Brightness",
+        "unit": "%", 
+        "listen": "Brightness",
+        "evaldo": [
+          {"test": true, "then": "BRIGHTNESSCHANGE", "or": ""}
+        ]
+      }
+    },
+    "buttons": {
+      "SWITCHON": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_Ip:$HA_Port/api/services/light/turn_on\", \"headers\":{\"Authorization\":\"Bearer $HA_ApiToken\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"$EntityId\"}}",
+        "evalwrite": [{"variable": "SwitchedOn", "value": true}]
+      },
+      "SWITCHOFF": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_Ip:$HA_Port/api/services/light/turn_off\", \"headers\":{\"Authorization\":\"Bearer $HA_ApiToken\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"$EntityId\"}}",
+        "evalwrite": [{"variable": "SwitchedOn", "value": false}]
+      },
+      "BRIGHTNESSCHANGE": {
+        "label": "",
+        "type": "http-rest",
+        "command": "DYNAMIK \"{\\\"verb\\\":\\\"post\\\",\\\"call\\\":\\\"http://$HA_Ip:$HA_Port/api/services/light/turn_on\\\", \\\"headers\\\":{\\\"Authorization\\\":\\\"Bearer $HA_ApiToken\\\", \\\"Content-Type\\\":\\\"application/json\\\"}, \\\"message\\\":{\\\"entity_id\\\":\\\"$EntityId\\\", \\\"brightness\\\": \" + Math.round(2.55 * $Brightness) + \"}}\""
+      }
+    }
+
+  }
+}
