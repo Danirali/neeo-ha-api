@@ -4,9 +4,9 @@
   "type": "AVRECEIVER",
   "version": 2,
   "variables": {
-    "HA_IP": "192.168.x.x", 
+    "HA_IP": "192.168.0.6", 
     "HA_Port": "8123",      
-    "HA_Token": "xxxx", 
+    "HA_Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI4MjAyM2MwYjUxMWQ0ZDE0YTY4MDljM2E4OTUyNjVmNCIsImlhdCI6MTc1Mzk1MjQ2NCwiZXhwIjoyMDY5MzEyNDY0fQ.BX6hhiVCFHvhVbzUAhhYz-HIdKNHq9BB13sHUzh1n3s", 
     "EntityId": "cinema_room",
     "Name": "Apple TV"
   },
@@ -49,7 +49,7 @@
           "Authorization": "Bearer $HA_Token",
           "Content-Type": "application/json"
         },
-        "pooltime": "10000", 
+        "pooltime": "60", 
         "queryresult": ["$.state", "$.attributes.entity_picture", "$.attributes.volume_level"], 
         "evalwrite": [
           {
@@ -164,44 +164,37 @@
       "CURSOR UP": {
         "label": "",
         "type": "http-rest",
-        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$UP"},
-        "evalwrite": []
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$UP"
       },
       "CURSOR DOWN": {
         "label": "",
         "type": "http-rest",
-        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$DOWN"},
-        "evalwrite": []
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$DOWN"
       },
       "CURSOR LEFT": {
         "label": "",
         "type": "http-rest",
-        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$LEFT"},
-        "evalwrite": []
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$LEFT"
       },
       "CURSOR RIGHT": {
         "label": "",
         "type": "http-rest",
-        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$RIGHT"},
-        "evalwrite": []
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$RIGHT"
       },
       "CURSOR ENTER": {
         "label": "",
         "type": "http-rest",
-        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$ENTER"},
-        "evalwrite": []
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$ENTER"
       },
       "CURSOR BACK": {
         "label": "",
         "type": "http-rest",
-        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$BACK"},
-        "evalwrite": []
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$BACK"
       },
       "CURSOR MENU": {
         "label": "",
         "type": "http-rest",
-        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$DOWN"},
-        "evalwrite": []
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$MENU"
       }
     }
   }
