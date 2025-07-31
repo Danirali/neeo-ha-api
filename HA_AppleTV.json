@@ -4,9 +4,9 @@
   "type": "AVRECEIVER",
   "version": 2,
   "variables": {
-    "HA_IP": "192.168.0.6", 
+    "HA_IP": "192.168.x.x", 
     "HA_Port": "8123",      
-    "HA_Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI4MjAyM2MwYjUxMWQ0ZDE0YTY4MDljM2E4OTUyNjVmNCIsImlhdCI6MTc1Mzk1MjQ2NCwiZXhwIjoyMDY5MzEyNDY0fQ.BX6hhiVCFHvhVbzUAhhYz-HIdKNHq9BB13sHUzh1n3s", 
+    "HA_Token": "xxxx", 
     "EntityId": "cinema_room",
     "Name": "Apple TV"
   },
