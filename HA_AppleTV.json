@@ -4,15 +4,15 @@
   "type": "AVRECEIVER",
   "version": 2,
   "variables": {
-    "HA_IP": "192.168.0.6", 
+    "HA_IP": "HA_IP_ADDRESS_HERE", 
     "HA_Port": "8123",      
-    "HA_Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI4MjAyM2MwYjUxMWQ0ZDE0YTY4MDljM2E4OTUyNjVmNCIsImlhdCI6MTc1Mzk1MjQ2NCwiZXhwIjoyMDY5MzEyNDY0fQ.BX6hhiVCFHvhVbzUAhhYz-HIdKNHq9BB13sHUzh1n3s", 
+    "HA_Token": "HA_API_TOKEN", 
     "EntityId": "cinema_room",
     "Name": "Apple TV"
   },
   "discover": {
     "welcomeheadertext": "Home Assistant Apple TV Driver",
-    "welcomedescription": "This driver controls selected Apple TVs via the Home Assistant Rest API.",
+    "welcomedescription": "This driver controls selected Apple TVs via the Home Assistant Rest API. Edit entity_id and remote commands in the driver file.",
     "command": {
       "type": "static",
       "command": "",
@@ -49,7 +49,7 @@
           "Authorization": "Bearer $HA_Token",
           "Content-Type": "application/json"
         },
-        "pooltime": "60", 
+        "pooltime": "7000", 
         "queryresult": ["$.state", "$.attributes.entity_picture", "$.attributes.volume_level"], 
         "evalwrite": [
           {
