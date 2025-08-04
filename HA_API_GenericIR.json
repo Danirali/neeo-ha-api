@@ -1,0 +1,114 @@
+{
+  "name": "Home Assistant API Generic IR Device",
+  "manufacturer": "Danirali",
+  "type": "LIGHT",
+  "version": 3,
+  "variables": {
+    "HA_IP": "<HA_IP>", 
+    "HA_Port": "8123",      
+    "HA_Token": "<HA_API_TOKEN>", 
+    "EntityId": "input_boolean.fireplace",
+    "IRController": "remote.rm4_pro",
+    "Name": "Fireplace"
+  },
+  "discover": {
+    "welcomeheadertext": "Light Driver for Generic IR Device",
+    "welcomedescription": "This driver controls a Generic IR Device through the HA Rest API.",
+    "command": {
+      "type": "static",
+      "command": ".",
+      "queryresult": "$" 
+    }
+  },
+  "template": {
+    "name": "$Name",
+    "dynamicname": "$Name",
+    "dynamicid": "$Name_ha_http", 
+    "variables": {
+      "HA_IP": "$HA_IP",
+      "HA_Port": "$HA_Port",
+      "HA_Token": "$HA_Token",
+      "EntityId": "$EntityId",
+      "IRController": "$IRController",
+      "RemoteStatus": "",
+      "cmd_brightness": "COLOUR1",
+      "cmd_colour": "COLOUR2",
+      "cmd_heat_on": "TEMP_INC",
+      "cmd_heat_off": "TEMP_DEC",
+      "SwitchedOn": false
+    },
+    "listeners": {
+      "HAStatus": {
+        "type": "http-get",
+        "ishub": true, 
+        "command": "http://$HA_IP:$HA_Port/api/states/$EntityId", 
+        "headers": {
+          "Authorization": "Bearer $HA_Token",
+          "Content-Type": "application/json"
+        },
+        "pooltime": "30000", 
+        "queryresult": ["$.state"], 
+        "evalwrite": [
+          {
+            "variable": "SwitchedOn",
+            "value": "DYNAMIK JSON.parse(\"$Result\")[0] === 'on'"
+          }
+        ]
+      }
+    },
+    "switches": {
+      "POWER": {
+        "label": "On",
+        "listen": "SwitchedOn",
+        "evaldo": [
+          {"test": "DYNAMIK $Result", "then": "SWITCHON", "or": "SWITCHOFF"}
+        ]
+      }
+    },
+    "buttons": {
+      "SWITCHON": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/input_boolean/turn_on\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"$EntityId\"}}",
+        "evalwrite": [{"variable": "SwitchedOn", "value": true}]
+      },
+      "SWITCHOFF": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/input_boolean/turn_off\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"$EntityId\"}}",
+        "evalwrite": [{"variable": "SwitchedOn", "value": false}]
+      },
+      "BRIGHTNESS": {
+        "label": "Brightness",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"$IRController\",\"device\":\"$Name\",\"command\":\"$cmd_brightness\"}}",
+        "evalwrite": [{"variable": "RemoteStatus", "value": "COLOUR1"}]
+      },
+      "FLAME CLR": {
+        "label": "Flame Colour",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"$IRController\",\"device\":\"$Name\",\"command\":\"$cmd_colour\"}}",
+        "evalwrite": [{"variable": "RemoteStatus", "value": "COLOUR2"}]
+      },
+      "HEAT ON": {
+        "label": "Heat On",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"$IRController\",\"device\":\"$Name\",\"command\":\"$cmd_heat_on\"}}",
+        "evalwrite": [{"variable": "RemoteStatus", "value": "MODE_HEAT_HI"}]
+      },
+      "HEAT OFF": {
+        "label": "Heat Off",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"$IRController\",\"device\":\"$Name\",\"command\":\"$cmd_heat_off\"}}",
+        "evalwrite": [{"variable": "RemoteStatus", "value": "MODE_HEAT_LO"}]
+      }
+    },
+    "labels": {
+      "RemoteStatusLabel": {
+        "label": "Remote IR Command",
+        "listen": "$RemoteStatus",
+        "actionlisten": "$RemoteStatus"
+      }
+    }
+  }
+}
