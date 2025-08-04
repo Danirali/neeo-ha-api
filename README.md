@@ -5,7 +5,7 @@ Contents:
   - [Light Driver](#light-driver-rest-api)
   - [Generic IR Device](#generic-ir-rest-api-broadlink)
 - [HA Emulated Hue](#emulated-hue)
-- MQTT Bridge to HA
+- [MQTT Bridge to HA](#mqtt-bridge-to-ha)
 <br>
 There are a few ways to integrate Home Assistant to the NEEO remote with the help of [*metadriver*](https://github.com/jac459/metadriver). The three popular methods are:
 - MQTT [Advanced]
