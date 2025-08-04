@@ -6,6 +6,7 @@ Contents:
   - [Generic IR Device](#generic-ir-rest-api-broadlink)
 - [HA Emulated Hue](#emulated-hue)
 - [MQTT Bridge to HA](#mqtt-bridge-to-ha)
+- [How to Install Drivers](#install-drivers)
 <br>
 
 There are a few ways to integrate Home Assistant to the NEEO remote with the help of [metadriver](https://github.com/jac459/metadriver) The three popular methods are:
@@ -173,70 +174,8 @@ The documentation can be found [here](https://www.home-assistant.io/integrations
 Home Assistant is capable of exposing more domains to Emulated Hue however the driver has been written to work on LIGHT components, if you wish to use other components, refer to metadriver's documentation of allowed domains.
 The driver for this has been adapted from the original driver: [meta-hue](https://github.com/jac459/meta-hue) developed by [JAC459](https://github.com/jac459)
 
-Driver:
-```
-{ "name":"Emulated Hue by Danirali",
-  "manufacturer":"Home Assistant",
-  "type":"LIGHT",
-  "version":21,
-  "persistedvariables":{
-    "ToInitiate":true,
-    "HueBridgeIp":"<HA_IP>",
-    "HueUserName":"v2",
-    "HueBridgePort":"<EMULATED_PORT (8300)>"
-  },
-  "discover":{
-    "welcomeheadertext":"Hue Driver",
-    "welcomedescription":"Warning ! Press the button on your Hue bridge before pressing next.",
-    "command": {"type":"http-get", "command":"http://$HueBridgeIp:$HueBridgePort/api/$HueUserName/lights", "queryresult":["$.*~","$..name"]}
-  },
-  "template" : {
-    "name":"Hue", 
-    "dynamicname":"DYNAMIK_INST_START DYNAMIK \"Light \" + JSON.parse(\"$Result\")[1] DYNAMIK_INST_END",
-    "dynamicid":"DYNAMIK_INST_START DYNAMIK \"Light \" + JSON.parse(\"$Result\")[0] DYNAMIK_INST_END",
-    
-    "variables":{
-      "HueBridgeIp":"$HueBridgeIp",
-      "HueUserName":"$HueUserName",
-      "HueBridgePort":"$HueBridgePort",  
-      "LightNumber":"DYNAMIK_INST_START DYNAMIK JSON.parse(\"$Result\")[0] DYNAMIK_INST_END",
-      "Brightness":"100",
-      "SavedBright":"100",
-      "Color":"",
-      "SwitchedOn":false
-    },
-    "listeners" : {
-      "HueStatus" : {"type":"http-get", "ishub":true, "command":"http://$HueBridgeIp:$HueBridgePort/api/$HueUserName/lights", "pooltime":"3000", "poolduration":"", "queryresult" : ["$.*~","$.[*].state"], 
-        "evalwrite" : [ 
-          {"variable" : "Brightness", "value" : "DYNAMIK JSON.parse(\"$Result\").find(elt => elt[0] === \"$LightNumber\")[1].on ? Math.round(JSON.parse(\"$Result\").find(elt => elt[0] == \"$LightNumber\")[1].bri/2.54) : 0"},
-          {"variable" : "SwitchedOn", "value" : "DYNAMIK JSON.parse(\"$Result\").find(elt => elt[0] === \"$LightNumber\")[1].on"}
-   ]
-        }
-    },
-    "switches":{
-      "POWER" : {"label":"On", "listen":"SwitchedOn", "evaldo":[{"test":"DYNAMIK $Result", "then":"SWITCHON", "or":"SWITCHOFF"}]}
-    },
-    "sliders":{
-        "BRIGHTNESS": {"label":"Brightness", "unit" : "Lux", "listen" : "Brightness", "evaldo":[{"test":true, "then":"BRIGHTNESSCHANGE", "or":""}]}
-    },
-    "buttons":{
-        "POWER ON": {"label":"", "type":"static", "command":"", "evaldo":[{"test":true,"then":"__INITIALISE", "or":""}]},
-        "POWER OFF": {"label":"", "type":"static", "command":"", "evaldo":[{"test":true,"then":"__CLEANUP", "or":""}]},
-        "SWITCHON": {"label":"", "type":"http-rest", "command":"{\"verb\":\"put\",\"call\":\"http://$HueBridgeIp:$HueBridgePort/api/$HueUserName/lights/$LightNumber/state\", \"message\":{\"on\": true}}", "evalwrite":[{"variable":"SwitchedOn","value":true}, {"variable":"Brightness","value":"DYNAMIK Math.round($SavedBright)"}]},
-        "SWITCHOFF": {"label":"", "type":"http-rest", "command":"{\"verb\":\"put\",\"call\":\"http://$HueBridgeIp:$HueBridgePort/api/$HueUserName/lights/$LightNumber/state\", \"message\":{\"on\": false}}", "evalwrite":[{"variable":"SwitchedOn","value":false}, {"variable":"SavedBright","value":"DYNAMIK Math.round($Brightness)"}, {"variable":"Brightness","value":0}]},
-        "BRIGHTNESSCHANGE": {"label":"", "type":"http-rest", "command":"DYNAMIK \"{\\\"verb\\\":\\\"put\\\",\\\"call\\\":\\\"http://$HueBridgeIp:$HueBridgePort/api/$HueUserName/lights/$LightNumber/state\\\", \\\"message\\\":{\\\"bri\\\": \" + Math.round(254/100*$Brightness) + \"}}\""}
-    },
-    "directories":{
-      "Colors": {"label":"Color Picker", "feeders": {
-          "color":{"label":"", "commandset": [{"type":"static", "command": "[{\"color\":{\"hue\":25652,\"sat\":254, \"xy\": [ 0.674, 0.322 ], \"ct\":289}, \"imageurl\":\"https://raw.githubusercontent.com/jac459/NeeoHueDriver/master/Resources/Col_Red.jpg\"}, {\"color\":{\"hue\":7458,\"sat\":252, \"xy\": [ 0.5958, 0.3791 ], \"ct\":153}, \"imageurl\":\"https://raw.githubusercontent.com/jac459/NeeoHueDriver/master/Resources/Col_Orange.jpg\"}, {\"color\":{\"hue\":37458,\"sat\":149, \"xy\": [ 0.5158, 0.3721 ], \"ct\":235}, \"imageurl\":\"https://raw.githubusercontent.com/jac459/NeeoHueDriver/master/Resources/Col_Light_Orange.jpg\"}, {\"color\":{\"hue\":65511,\"sat\":43, \"xy\": [ 0.4302, 0.3675 ], \"ct\":322}, \"imageurl\":\"https://raw.githubusercontent.com/jac459/NeeoHueDriver/master/Resources/Col_Warm_White.jpg\"}, {\"color\":{\"hue\":34153,\"sat\":243, \"xy\": [ 0.3157, 0.33 ], \"ct\":156}, \"imageurl\":\"https://raw.githubusercontent.com/jac459/NeeoHueDriver/master/Resources/Col_Full_White.jpg\"}, {\"color\":{\"hue\":35616,\"sat\":238, \"xy\": [ 0.3016, 0.3005 ], \"ct\":153}, \"imageurl\":\"https://raw.githubusercontent.com/jac459/NeeoHueDriver/master/Resources/Col_Cold_White.jpg\"}, {\"color\":{\"hue\":25653,\"sat\":254, \"xy\": [ 0.4084, 0.5168 ], \"ct\":289}, \"imageurl\":\"https://raw.githubusercontent.com/jac459/NeeoHueDriver/master/Resources/Col_Green.jpg\"}, {\"color\":{\"hue\":43110,\"sat\":252, \"xy\": [ 0.2102, 0.1248 ], \"ct\":153}, \"imageurl\":\"https://raw.githubusercontent.com/jac459/NeeoHueDriver/master/Resources/Col_Light_Blue.jpg\"}, {\"color\":{\"hue\":46989,\"sat\":251, \"xy\": [ 0.1708, 0.0465 ], \"ct\":153}, \"imageurl\":\"https://raw.githubusercontent.com/jac459/NeeoHueDriver/master/Resources/Col_Deep_Blue.jpg\"}, {\"color\":{\"hue\":59221,\"sat\":253, \"xy\": [ 0.5005, 0.226 ], \"ct\":443}, \"imageurl\":\"https://raw.githubusercontent.com/jac459/NeeoHueDriver/master/Resources/Col_Pink.jpg\"}]", "queryresult":"$.*", "itemtype": "tile", "itemaction":"colorSet", "itemimage":"DYNAMIK JSON.parse(\"$Result\").imageurl", "evalwrite":[{"variable":"Color","value":"DYNAMIK JSON.stringify(JSON.parse(\"$Result\").color)"}]}]},
-          "colorSet":{"label":"", "commandset": [{"type":"http-rest", "command":"{\"verb\":\"put\",\"call\":\"http://$HueBridgeIp:$HueBridgePort/api/$HueUserName/lights/$LightNumber/state\", \"message\":$Color}"}]}
-        }
-      }
-    }
-  }
-}
-```
-
+The driver can be found under files as `EmulatedHue_Light.json`
+`wget https://github.com/Danirali/neeo-metadriver-homeassistant/blob/main/EmulatedHue_Light.json`
 <br>
 <br>
 
@@ -255,3 +194,16 @@ try_private true
 cleansession false
 
 ```
+ <br>
+ <br>
+
+ ## Install Drivers
+
+To install these drivers to your metadriver, locate to your meta install and navigate to the `active` folder usually `/home/YOUR_USER/meta/active`. You then need to move the driver into this folder. This can be done by downloading the file to the folder by using `wget` on Linux or if you are using another PC to the one running meta you can use `scp`.
+
+Examples:
+- Linux
+  `wget https://github.com/Danirali/neeo-metadriver-homeassistant/blob/main/EmulatedHue_Light.json`
+- MacOS/Windows to Linux
+  `scp ~/Downloads/driver.json user@ip-address:/home/USER/meta/active`
+ 
