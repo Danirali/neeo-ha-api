@@ -1,0 +1,260 @@
+{
+  "name": "Home Assistant Media Player Driver",
+  "manufacturer": "Danirali",
+  "type": "AVRECEIVER",
+  "version": 2,
+  "variables": {
+    "HA_IP": "<HA_IP>",
+    "HA_Port": "8123",
+    "HA_Token": "<HA_API_Token>",
+    "EntityId": "<entity_id without media_player. or remote.>",
+    "Name": "Apple TV"
+  },
+  "discover": {
+    "welcomeheadertext": "Home Assistant Apple TV Driver",
+    "welcomedescription": "This driver controls selected Apple TVs via the Home Assistant Rest API. ",
+    "command": {
+      "type": "static",
+      "command": "",
+      "queryresult": ""
+    }
+  },
+  "template": {
+    "name": "$Name",
+    "dynamicname": "$Name",
+    "dynamicid": "$EntityId_ha_http",
+    "variables": {
+      "HA_IP": "$HA_IP",
+      "HA_Port": "$HA_Port",
+      "HA_Token": "$HA_Token",
+      "EntityId": "$EntityId",
+      "SwitchedOn": false,
+      "DEBUG": "",
+      "Volume": 0,
+      "PlayerState": "unknown",
+      "MediaCoverURI": "",
+      "UP": "up",
+      "DOWN": "down",
+      "LEFT": "left",
+      "RIGHT": "right",
+      "ENTER": "select",
+      "BACK": "menu",
+      "MENU": "home",
+      "MUTE": "mute"
+    },
+    "listeners": {
+      "HAStatus": {
+        "type": "http-get",
+        "ishub": true,
+        "command": "http://$HA_IP:$HA_Port/api/states/media_player.$EntityId",
+        "headers": {
+          "Authorization": "Bearer $HA_Token",
+          "Content-Type": "application/json"
+        },
+        "pooltime": "6000",
+        "queryresult": [
+          "$.state",
+          "$.entity_picture",
+          "$.media_title"
+        ],
+        "evalwrite": [
+          {
+            "variable": "SwitchedOn",
+            "value": "DYNAMIK JSON.parse(\"$Result\")[0] === 'on' || JSON.parse(\"$Result\")[0] === 'playing' || JSON.parse(\"$Result\")[0] === 'paused' || JSON.parse(\"$Result\")[0] === 'idle'"
+          },
+          {
+            "variable": "MediaCoverURI",
+            "value": "DYNAMIK JSON.parse(\"$Result\")[1]"
+          },
+          {
+            "variable": "MediaTitle",
+            "value": "DYNAMIK JSON.parse(\"$Result\")[2]"
+          },
+          {
+            "variable": "PlayerState",
+            "value": "DYNAMIK JSON.parse(\"$Result\")[0]"
+          },
+          {
+            "variable": "DEBUG",
+            "value": "DYNAMIK JSON.parse(\"$Result\")[0] | DYNAMIK JSON.parse(\"$Result\")[1] | DYNAMIK JSON.parse(\"$Result\")[2]"
+          }
+        ]
+      }
+    },
+    "switches": {
+      "POWER": {
+        "label": "On",
+        "listen": "SwitchedOn",
+        "evaldo": [
+          {
+            "test": "DYNAMIK $Result",
+            "then": "POWER ON",
+            "or": "POWER OFF"
+          }
+        ]
+      }
+    },
+    "sliders": {
+      "VOLUME": {
+        "label": "Volume",
+        "unit": "%",
+        "evaldo": [
+          {
+            "test": true,
+            "then": "__VOLUMECHANGE",
+            "or": ""
+          }
+        ]
+      }
+    },
+    "images": {
+      "AlbumCover": {
+        "label": "",
+        "size": "large",
+        "listen": "http://$HA_IP:$HA_Port/$MediaCoverURI"
+      },
+      "AlbumThumbnail": {
+        "label": "",
+        "size": "small",
+        "listen": "http://$HA_IP:$HA_Port/$MediaCoverURI"
+      }
+    },
+    "labels": {
+      "Title": {
+        "label": "",
+        "actionlisten": "$MediaTitle",
+        "listen": "$MediaTitle"
+      },
+      "State": {
+        "label": "",
+        "actionlisten": "$PlayerState",
+        "listen": "$PlayerState"
+      },
+      "DEBUG_TXT": {
+        "label": "",
+        "actionlisten": "$DEBUG",
+        "listen": "$DEBUG"
+      }
+    },
+    "buttons": {
+      "POWER ON": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/media_player/turn_on\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"media_player.$EntityId\"}}",
+        "evalwrite": [
+          {
+            "variable": "SwitchedOn",
+            "value": true
+          }
+        ]
+      },
+      "POWER OFF": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/media_player/turn_off\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"media_player.$EntityId\"}}",
+        "evalwrite": [
+          {
+            "variable": "SwitchedOn",
+            "value": false
+          }
+        ]
+      },
+      "VOLUME UP": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/media_player/volume_up\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"media_player.$EntityId\"}}",
+        "evalwrite": []
+      },
+      "VOLUME DOWN": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/media_player/volume_down\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"media_player.$EntityId\"}}",
+        "evalwrite": []
+      },
+      "PLAY": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/media_player/media_play\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"media_player.$EntityId\"}}",
+        "evalwrite": []
+      },
+      "PAUSE": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/media_player/media_pause\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"media_player.$EntityId\"}}",
+        "evalwrite": []
+      },
+      "PLAY TOGGLE": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/media_player/media_play_pause\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"media_player.$EntityId\"}}",
+        "evalwrite": []
+      },
+      "STOP": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/media_player/media_stop\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"media_player.$EntityId\"}}",
+        "evalwrite": []
+      },
+      "NEXT": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/media_player/media_next_track\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"media_player.$EntityId\"}}",
+        "evalwrite": []
+      },
+      "PREVIOUS": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/media_player/media_previous_track\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"media_player.$EntityId\"}}",
+        "evalwrite": []
+      },
+      "CURSOR UP": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$UP\"}}",
+        "evalwrite": []
+      },
+      "CURSOR DOWN": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$DOWN\"}}",
+        "evalwrite": []
+      },
+      "CURSOR LEFT": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$LEFT\"}}",
+        "evalwrite": []
+      },
+      "CURSOR RIGHT": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$RIGHT\"}}",
+        "evalwrite": []
+      },
+      "CURSOR ENTER": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$ENTER\"}}",
+        "evalwrite": []
+      },
+      "BACK": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$BACK\"}}",
+        "evalwrite": []
+      },
+      "MENU": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$MENU\"}}",
+        "evalwrite": []
+      },
+      "MUTE TOGGLE": {
+        "label": "",
+        "type": "http-rest",
+        "command": "{\"verb\":\"post\",\"call\":\"http://$HA_IP:$HA_Port/api/services/remote/send_command\", \"headers\":{\"Authorization\":\"Bearer $HA_Token\", \"Content-Type\":\"application/json\"}, \"message\":{\"entity_id\":\"remote.$EntityId\",\"command\":\"$MUTE\"}}",
+        "evalwrite": []
+      }
+    }
+  }
+}
