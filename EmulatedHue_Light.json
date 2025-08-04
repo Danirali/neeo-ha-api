@@ -1,16 +1,16 @@
-{ "name":"Emulated Hue",
-  "manufacturer":"Home Assistant\nby Danirali",
+{ "name":"Emulated Hue by Danirali",
+  "manufacturer":"Home Assistant Danirali",
   "type":"LIGHT",
   "version":20,
   "persistedvariables":{
     "ToInitiate":true,
-    "HueBridgeIp":"192.168.0.6",
+    "HueBridgeIp":"<HA_IP>",
     "HueUserName":"v2",
     "HueBridgePort":"8300"
   },
   "discover":{
-    "welcomeheadertext":"Hue Driver",
-    "welcomedescription":"Warning ! Press the button on your Hue bridge before pressing next.",
+    "welcomeheadertext":"Emulated Hue Driver",
+    "welcomedescription":"By pressing next, the driver will attempt to request data from the Emulated Hue server running within Home Assistant.",
     "command": {"type":"http-get", "command":"http://$HueBridgeIp:$HueBridgePort/api/$HueUserName/lights", "queryresult":["$.*~","$..name"]}
   },
   "template" : {
