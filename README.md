@@ -2,9 +2,10 @@
 Contents:
 - [HA REST API](#HA-Rest-API)
   - [Media Player Driver](#media-player-driver-rest-api)
-  - Light Driver
-  - Generic IR Device
+  - [Light Driver](#light-driver-rest-api)
+  - [Generic IR Device](#generic-ir-rest-api-broadlink)
 - [HA Emulated Hue](#emulated-hue)
+- MQTT Bridge to HA
 <br>
 There are a few ways to integrate Home Assistant to the NEEO remote with the help of [*metadriver*](https://github.com/jac459/metadriver). The three popular methods are:
 - MQTT [Advanced]
@@ -14,7 +15,7 @@ There are a few ways to integrate Home Assistant to the NEEO remote with the hel
 Due to my lack of expertise with MQTT, I will be showing you how you can integrate HA through Emulated Hue and Rest API, I've left *templates* in the repo files as generic drivers to run your devices.
 <br>
 
-## HA Rest API
+# HA Rest API
 
 The HA Rest API is the easiest to integrate and you can get help from many AI models. When making a driver, the layout is usually the similar. When using the HA API the beginning of the drive is always the same. These variables store you HA instance's login credientials (it is advised to create a new login).
 
@@ -40,7 +41,7 @@ I have currently developed my drivers to rely on static configs, I _do not_ use 
   },
 ```
 
-# Media Player Driver (Rest API)
+## Media Player Driver (Rest API)
 The Media Player Driver can be adjusted without altering too much code by changing the variables. The media player driver was originally designed to work with Apple TV however can work with (nearly) any Media Player. I've tested the driver on LG webOS TV and Apple TV (integrated into HA).
 
 This driver directly maps the controls to the controlpad of the NEEO remote. For example, using the Volume buttons on the NEEO remote adjusts the volume on your device. 
@@ -77,3 +78,25 @@ To driver relies on the `remote.send_command` service. To change your commands, 
 Do not edit any variables until after 'MediaCoverURI'. The variables after this one are your controls, you edit the data on the right for example:
 
 For Apple TV: to go back the key is `menu` so `"BACK": "menu"`
+<br>
+## Light Driver (Rest API)
+The driver for the the light driver can be found in the files as `HA_API_Light.json`. To configure the driver to your spec you will need to modify the following variables:
+```
+  HA_IP, HA_Token, EntityId
+```
+These variables are located at the top of the file under the variables section.
+Full file context:
+```
+{
+  "name": "HA API Light by Danirali",
+  "manufacturer": "Home Assistant",
+  "type": "LIGHT",
+  "version": 2,
+  "variables": {
+    "HA_IP": "<HA_IP>",
+    "HA_Port": "8123",   
+    "HA_Token": "<HA_API_TOKEN>",
+    "EntityId": "light.kitchen_island_lights"
+  },
+```
+
