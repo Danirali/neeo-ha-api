@@ -8,9 +8,9 @@ Contents:
 - [MQTT Bridge to HA](#mqtt-bridge-to-ha)
 <br>
 There are a few ways to integrate Home Assistant to the NEEO remote with the help of [metadriver](https://github.com/jac459/metadriver) The three popular methods are:
-- MQTT [Advanced]
-- HA Rest API (SHOWN) [Moderate Difficulty for less savy users]
-- HA Emulated Hue (SHOWN) [Easiest]
+- MQTT (Advanced)
+- HA Rest API (Moderate Difficulty for less savy users)
+- HA Emulated Hue (Easiest)
 
 Due to my lack of expertise with MQTT, I will be showing you how you can integrate HA through Emulated Hue and Rest API, I've left *templates* in the repo files as generic drivers to run your devices.
 
