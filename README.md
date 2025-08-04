@@ -248,8 +248,8 @@ I am using an MQTT bridge as part of my setup, by bridging the two mosquitto ins
 
 connection ha_bridge
 address <HA_IP>:<MQTT_PORT>
-remote_username metadriver
-remote_password meta
+remote_username <MQTT_USERNAME>
+remote_password <MQTT_PASSWORD>
 topic # out 0
 try_private true
 cleansession false
