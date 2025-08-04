@@ -169,7 +169,8 @@ emulated_hue:
   - light
 ```
 The documentation can be found [here](https://www.home-assistant.io/integrations/emulated_hue/).
-
+### Please Note ###
+Home Assistant is capable of exposing more domains to Emulated Hue however the driver has been written to work on LIGHT components, if you wish to use other components, refer to metadriver's documentation of allowed domains.
 The driver for this has been adapted from the original driver: [meta-hue](https://github.com/jac459/meta-hue) developed by [JAC459](https://github.com/jac459)
 
 Driver:
