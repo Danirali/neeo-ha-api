@@ -1,10 +1,18 @@
 # Using NEEO Remote (prior control4) with Home Assistant
+Contents:
+- [HA REST API](#HA-Rest-API)
+  - [Media Player Driver](#media-player-driver-rest-api)
+  - Light Driver
+  - Generic IR Device
+- [HA Emulated Hue](#emulated-hue)
+<br>
 There are a few ways to integrate Home Assistant to the NEEO remote with the help of [*metadriver*](https://github.com/jac459/metadriver). The three popular methods are:
-- MQTT
-- HA Rest API (SHOWN)
-- HA Emulated Hue (SHOWN)
+- MQTT [Advanced]
+- HA Rest API (SHOWN) [Moderate Difficulty for less savy users]
+- HA Emulated Hue (SHOWN) [Easiest]
 
 Due to my lack of expertise with MQTT, I will be showing you how you can integrate HA through Emulated Hue and Rest API, I've left *templates* in the repo files as generic drivers to run your devices.
+<br>
 
 ## HA Rest API
 
