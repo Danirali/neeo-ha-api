@@ -240,12 +240,12 @@ Driver:
 
 # MQTT Bridge to HA
 
-I am using an MQTT bridge as part of my setup, it can be setup by modifying `/etc/mosquitto/mosquitto.conf` and adding the following:
+I am using an MQTT bridge as part of my setup, by bridging the two mosquitto instances. It can be setup by modifying `/etc/mosquitto/mosquitto.conf` and adding the following:
 ```
 #### HA BRIDGE #### 
 
 connection ha_bridge
-address 192.168.10.6:1883
+address <HA_IP>:<MQTT_PORT>
 remote_username metadriver
 remote_password meta
 topic # out 0
